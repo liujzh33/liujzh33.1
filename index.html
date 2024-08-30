@@ -3,41 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Simple Website</title>
+    <title>Moving Points with Lines and Color Change</title>
     <style>
-        /* 使标题居左 */
-        h1 {
-            text-align: left;
-        }
-
-        /* 段落样式，增加第二行文字 */
-        p {
-            text-align: center;
-            position: absolute;
-            top: 0; /* 让段落紧贴页面顶部 */
-            width: 100%; /* 让段落的宽度覆盖整个页面 */
+        body {
             margin: 0;
+            overflow: hidden;
+            background-color: black;
         }
-
-        /* 使页面末尾的文字居中 */
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.5); /* 可选: 为底部加一个半透明背景 */
-            padding: 10px;
+        canvas {
+            display: block;
         }
     </style>
 </head>
-<body style="background-image: url('background.jpg'); background-size: cover;">
-    <h1>Liux</h1>
-    <p>随着网站一起进步吧！<br>COME ON！</p>
-    
-    <!-- 页面末尾居中显示“结束” -->
-    <div class="footer">
-        中大(深圳)
-    </div>
+<body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 设置画布大小
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 定义点的数量、初始速度、连线的最大距离以及颜色变化的时间间隔
+        const numPoints = 10;
+        const maxDistance = 150;  // 当两点之间距离小于这个值时才连线
+        const mouseDistanceThreshold = 200;  // 鼠标与点之间的连线距离阈值
+        const colorChangeInterval = 1000;  // 颜色变化时间间隔（毫秒）
+        const points = [];
+        const speeds = [];
+        const colors = [];
+        const colorOptions = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FFA500'];
+
+        // 随机生成点的位置、速度和颜色
+        for (let i = 0; i < numPoints; i++) {
+            points.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() * 4 - 2),  // 缓慢的速度
+                vy: (Math.random() * 4 - 2)
+            });
+            colors.push(colorOptions[Math.floor(Math.random() * colorOptions.length)]);
+        }
+
+        let lastColorChangeTime = Date.now();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 获取当前鼠标位置
+            let mouseX = canvas.width / 2;
+            let mouseY = canvas.height / 2;
+
+            canvas.addEventListener('mousemove', function(e) {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // 检查是否需要更换颜色
+            if (Date.now() - lastColorChangeTime > colorChangeInterval) {
+                for (let i = 0; i < numPoints; i++) {
+                    colors[i] = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+                }
+                lastColorChangeTime = Date.now();
+            }
+
+            // 更新每个点的位置并检查碰撞
+            for (let i = 0; i < numPoints; i++) {
+                points[i].x += points[i].vx;
+                points[i].y += points[i].vy;
+
+                // 碰撞检测：如果碰到窗口边界，反弹
+                if (points[i].x <= 0 || points[i].x >= canvas.width) {
+                    points[i].vx = -points[i].vx;
+                }
+                if (points[i].y <= 0 || points[i].y >= canvas.height) {
+                    points[i].vy = -points[i].vy;
+                }
+            }
+
+            // 在所有点之间绘制连线，仅当距离小于max_distance时
+            for (let i = 0; i < numPoints; i++) {
+                for (let j = i + 1; j < numPoints; j++) {
+                    const dist = Math.sqrt((points[i].x - points[j].x) ** 2 + (points[i].y - points[j].y) ** 2);
+                    if (dist < maxDistance) {
+                        ctx.strokeStyle = colors[i];
+                        ctx.beginPath();
+                        ctx.moveTo(points[i].x, points[i].y);
+                        ctx.lineTo(points[j].x, points[j].y);
+                        ctx.stroke();
+                    }
+                }
+
+                // 绘制点与鼠标之间的连线，仅当距离小于mouse_distance_threshold时
+                const mouseDist = Math.sqrt((points[i].x - mouseX) ** 2 + (points[i].y - mouseY) ** 2);
+                if (mouseDist < mouseDistanceThreshold) {
+                    ctx.strokeStyle = colors[i];
+                    ctx.beginPath();
+                    ctx.moveTo(points[i].x, points[i].y);
+                    ctx.lineTo(mouseX, mouseY);
+                    ctx.stroke();
+                }
+            }
+
+            // 绘制每个点
+            for (let i = 0; i < numPoints; i++) {
+                ctx.fillStyle = colors[i];
+                ctx.beginPath();
+                ctx.arc(points[i].x, points[i].y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
