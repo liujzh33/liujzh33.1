@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIUX</title>
     <style>
-         h1 {
-            text-align: center;
+        h1 {
+            text-align: left;
         }
 
         /* 段落样式，增加第二行文字 */
@@ -56,6 +56,9 @@
         const colors = [];
         const colorOptions = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FFA500'];
 
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+
         // 随机生成点的位置、速度和颜色
         for (let i = 0; i < numPoints; i++) {
             points.push({
@@ -67,19 +70,17 @@
             colors.push(colorOptions[Math.floor(Math.random() * colorOptions.length)]);
         }
 
+        // 更新鼠标位置
+        canvas.addEventListener('mousemove', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
         let lastColorChangeTime = Date.now();
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 获取当前鼠标位置
-            let mouseX = canvas.width / 2;
-            let mouseY = canvas.height / 2;
-
-            canvas.addEventListener('mousemove', function(e) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
 
             // 检查是否需要更换颜色
             if (Date.now() - lastColorChangeTime > colorChangeInterval) {
