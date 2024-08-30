@@ -3,19 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moving Points with Lines and Color Change</title>
+    <title>LIUX</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: black;
+         h1 {
+            text-align: center;
         }
-        canvas {
-            display: block;
+
+        /* 段落样式，增加第二行文字 */
+        p {
+            text-align: center;
+            position: absolute;
+            top: 0; /* 让段落紧贴页面顶部 */
+            width: 100%; /* 让段落的宽度覆盖整个页面 */
+            margin: 0;
+        }
+
+        /* 使页面末尾的文字居中，并固定在页面底部 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.5); /* 可选: 为底部加一个半透明背景 */
+            padding: 10px;
         }
     </style>
 </head>
-<body>
+<body style="background-image: url('background.jpg'); background-size: cover;">
+    <h1>Liux</h1>
+    <p>COME ON!</p>
+    <div class="footer">
+        中大
+    </div>
     <canvas id="myCanvas"></canvas>
 
     <script>
@@ -27,10 +47,10 @@
         canvas.height = window.innerHeight;
 
         // 定义点的数量、初始速度、连线的最大距离以及颜色变化的时间间隔
-        const numPoints = 10;
+        const numPoints = 50;
         const maxDistance = 150;  // 当两点之间距离小于这个值时才连线
         const mouseDistanceThreshold = 200;  // 鼠标与点之间的连线距离阈值
-        const colorChangeInterval = 1000;  // 颜色变化时间间隔（毫秒）
+        const colorChangeInterval = 10000;  // 颜色变化时间间隔（毫秒）
         const points = [];
         const speeds = [];
         const colors = [];
